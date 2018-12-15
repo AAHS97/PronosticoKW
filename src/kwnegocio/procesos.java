@@ -18,10 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import kwpersistencia.KWPersistencia;
 
-/**
- *
- * @author jaime
- */
 public class procesos {
     KWPersistencia db;
     Double tiempo = 0.0; // Tiempo de vestidura motor / eje
@@ -40,11 +36,11 @@ public class procesos {
         }
     }  
     // Empleados por departamento
-    public String empleadospordepto(Integer depto){
+    public String empleadospordepto(Integer depto_number){ // Se modifico el nombre de la variable
         String cantidad=null;
         int cant = 0;
         try {
-            cant = db.readdeptos(depto);
+            cant = db.readdeptos(depto_number);  // Se modifico el nombre de la variable
             //System.out.println("Procesos " + cant);
         } catch (SQLException ex) {
             Logger.getLogger(procesos.class.getName()).log(Level.SEVERE, null, ex);
@@ -63,23 +59,21 @@ public class procesos {
         return parametro;
     }
     // Update Parametros
-    public void UpdateParameters(int pro, int cap){
-        db.updatepatameters(pro, cap);
+    public void UpdateParameters(int production, int capacity){
+        db.updatepatameters(production, capacity);
     }
     // Agregar un modelo nuevo.
-    public void addnewmodel(String model, String motor, String tmotor,
-                            String t2ejes, String t3ejes){
-        double time2ejes = 0.0;
-        double time3ejes = 0.0;
-        db.addnewmodels(model, motor, tmotor, t2ejes, t3ejes);        
+    public void addnewmodel(String model, String motor, String time_engine,
+                            String time_2_axes, String time_3_axes){   // Se modifico el nombre de la variable
+        db.addnewmodels(model, motor, time_engine, time_2_axes, time_3_axes);      // Se modifico el nombre de la variable   
     }
     // Personal requerido para ejes
-    public Double recursospordeptoejes(String modelo, int cejes, int cproducir, String neumatico){        
+    public Double recursospordeptoejes(String modelo, int qty_axes, int cproducir, String neumatico){        
         String tmptiempo = null;
         Double CantEmp = 0.0;        
         //System.out.println("Cant ejes " + cejes);
         try {
-            tmptiempo = db.tiemporecursosejes(modelo, cejes);            
+            tmptiempo = db.tiemporecursosejes(modelo, qty_axes);            
             tiempo = Double.parseDouble(tmptiempo);
             if (neumatico.equalsIgnoreCase("Si")){
                 tiempo = tiempo + 0.5;
@@ -92,13 +86,13 @@ public class procesos {
         return CantEmp;
     }
     // Personal requerido para motores
-    public Double recursospordeptomotores(String modelo, int cproducir){
+    public Double recursospordeptomotores(String modelo, int qty_build){
         String tmptiempo = null;
         Double CantEmp = 0.0;
         try {
             tmptiempo = db.tiemporecursosmotores(modelo);
             tiempo = Double.parseDouble(tmptiempo);
-            CantEmp = ((tiempo * cproducir)/8);
+            CantEmp = ((tiempo * qty_build)/8);
             //CantEmp = (int)Math.ceil(tdouble);
         } catch (SQLException ex) {
             Logger.getLogger(procesos.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,30 +100,30 @@ public class procesos {
         return CantEmp;
     }
     // Cantidad de jubilados Motores
-    public String  jubilados(String fechapro, int depto){
+    public String  jubilados(String prod_date, int depto_number){
         //System.out.println("Fecha de entrada " + fechapro);
         String cantidad = null;
         try {
-            Date date = sdf.parse(fechapro);
+            Date date = sdf.parse(prod_date);
             date = subtractYears(date, 60);
             Date Fini = subtractDays(date, 30);
             Date Ffin = addDays(date, 30);
             String fIni = sdf.format(Fini);
             String fFin = sdf.format(Ffin);               
-            cantidad = db.jubilados(depto, fIni, fFin);            
+            cantidad = db.jubilados(depto_number, fIni, fFin);            
         } catch (ParseException | SQLException ex) {
             Logger.getLogger(procesos.class.getName()).log(Level.SEVERE, null, ex);
         }        
         return cantidad;
     }
     // Vacaciones
-    public String vacaciones(String fechapro, int depto){
+    public String vacaciones(String prod_date, int depto_number){
         //System.out.println("Fecha de entrada vaca " + fechapro);
         String cantidad = null;
         try {
-            Date date = sdf.parse(fechapro);
+            Date date = sdf.parse(prod_date);
             int weeknumber = WeekNumber(date);            
-            cantidad = db.vacaciones(depto, weeknumber);
+            cantidad = db.vacaciones(depto_number, weeknumber);
         } catch (ParseException | SQLException ex) {
             Logger.getLogger(procesos.class.getName()).log(Level.SEVERE, null, ex);
         }        
